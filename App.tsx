@@ -1,38 +1,109 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useState } from 'react';
+import { SafeAreaView, View, StyleSheet, StatusBar } from 'react-native';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { AppProvider, useApp } from './src/context/AppContext';
+import HomeScreen from './src/screens/HomeScreen';
+import TasksScreen from './src/screens/TasksScreen';
+import StatsScreen from './src/screens/StatsScreen';
+import AnalysisScreen from './src/screens/AnalysisScreen';
+import HistoryScreen from './src/screens/HistoryScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
+import TabButton from './src/components/TabButton';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+type TabType = 'Odak' | 'Tasks' | 'Stats' | 'Analysis' | 'History' | 'Settings';
+
+function AppContent() {
+  const [activeTab, setActiveTab] = useState<TabType>('Odak');
+  const { colors } = useApp();
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
+    <>
+      <View style={styles.content}>
+        <View style={[styles.screen, activeTab !== 'Odak' && styles.screenHidden]}>
+          <HomeScreen />
+        </View>
+
+        <View style={[styles.screen, activeTab !== 'Tasks' && styles.screenHidden]}>
+          <TasksScreen />
+        </View>
+
+        <View style={[styles.screen, activeTab !== 'Stats' && styles.screenHidden]}>
+          <StatsScreen />
+        </View>
+
+        <View style={[styles.screen, activeTab !== 'Analysis' && styles.screenHidden]}>
+          <AnalysisScreen />
+        </View>
+
+        <View style={[styles.screen, activeTab !== 'History' && styles.screenHidden]}>
+          <HistoryScreen />
+        </View>
+
+        <View style={[styles.screen, activeTab !== 'Settings' && styles.screenHidden]}>
+          <SettingsScreen />
+        </View>
+      </View>
+
+      <View
+        style={[
+          styles.tabBar,
+          {
+            backgroundColor: colors.tabBar,
+            borderTopColor: colors.tabBarBorder,
+          },
+        ]}
+      >
+        <TabButton
+          label="Odak"
+          isActive={activeTab === 'Odak'}
+          onPress={() => setActiveTab('Odak')}
+        />
+        <TabButton
+          label="Görev"
+          isActive={activeTab === 'Tasks'}
+          onPress={() => setActiveTab('Tasks')}
+        />
+        <TabButton
+          label="İstatistik"
+          isActive={activeTab === 'Stats'}
+          onPress={() => setActiveTab('Stats')}
+        />
+        <TabButton
+          label="Analiz"
+          isActive={activeTab === 'Analysis'}
+          onPress={() => setActiveTab('Analysis')}
+        />
+        <TabButton
+          label="Geçmiş"
+          isActive={activeTab === 'History'}
+          onPress={() => setActiveTab('History')}
+        />
+        <TabButton
+          label="Ayarlar"
+          isActive={activeTab === 'Settings'}
+          onPress={() => setActiveTab('Settings')}
+        />
+      </View>
+    </>
   );
 }
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
+function AppInner() {
+  const { colors, theme } = useApp();
 
   return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
+      <AppContent />
+    </SafeAreaView>
+  );
+}
+
+export default function App() {
+  return (
+    <AppProvider>
+      <AppInner />
+    </AppProvider>
   );
 }
 
@@ -40,6 +111,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  content: {
+    flex: 1,
+    position: 'relative',
+  },
+  screen: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  screenHidden: {
+    display: 'none',
+  },
+  tabBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    paddingVertical: 10,
+  },
 });
-
-export default App;
